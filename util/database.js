@@ -1,8 +1,18 @@
-const Sequelize = require("sequelize");
+const mongodb = require("mongodb");
+const MongoClient = mongodb.MongoClient;
 
-const sequelize = new Sequelize("node", "root", "", {
-  dialect: "mysql",
-  host: "localhost",
-});
+const password = "";
 
-module.exports = sequelize;
+const MongoConnect = (callback) => {
+  MongoClient.connect(
+    `mongodb+srv://User:${password}@cluster0.p2zd6.mongodb.net/<dbname>?retryWrites=true&w=majority`,
+    { useUnifiedTopology: true }
+  )
+    .then((client) => {
+      console.log("DB connected.");
+      callback(client);
+    })
+    .catch(console.log);
+};
+
+module.exports = MongoConnect;

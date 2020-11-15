@@ -2,16 +2,12 @@ const express = require("express");
 const path = require("path");
 const bodyParser = require('body-parser');
 
-const adminRoutes = require("./routes/admin");
-const shopRoutes = require("./routes/shop");
+// const adminRoutes = require("./routes/admin");
+// const shopRoutes = require("./routes/shop");
 const errorController = require('./controllers/error');
 
-const sequelize = require("./util/database");
-const Product = require("./models/product");
-const User = require("./models/user");
-const Cart = require("./models/cart");
-const CartItem = require("./models/cart-item");
-// const Products = require("./models/product");
+const MongoConnect = require("./util/database");
+
 
 const app = express();
 
@@ -21,41 +17,21 @@ app.set('views', 'views');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use((req, res, next) => {
-  User.findByPk(1)
-    .then(user => {
-      req.user = user
-      next()
-    })
-    .catch(
-      err => { console.log(err) }
-)})
+// app.use((req, res, next) => {
+  // User.findByPk(1)
+  //   .then(user => {
+  //     req.user = user
+  //     next()
+  //   })
+  //   .catch(
+  //     err => { console.log(err) }
+// )})
 
-app.use('/admin', adminRoutes);
-app.use(shopRoutes);
+// app.use('/admin', adminRoutes);
+// app.use(shopRoutes);
 app.use(errorController.get404);
 
-Product.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
-User.hasMany(Product);
-User.hasOne(Cart);
-Cart.belongsTo(User);
-Cart.belongsToMany(Product, { through: CartItem });
-Product.belongsToMany(Cart, { through: CartItem });
-
-sequelize
-  // .sync({ force: true })
-  .sync()
-  .then((res) => {
-    User.findByPk(1);
-  })
-  .then((user) => {
-    if (!user) {
-      User.create({ name: "Test user", email: "test@mail.com" });
-    }
-    return user;
-  })
-  .then((user) => {
-    return user.createCart();
-  })
-  .then(app.listen(3000))
-  .catch((e) => console.log(e));
+MongoConnect((client) => {
+  console.log(client);
+  app.listen(3000);
+});;
